@@ -6,25 +6,25 @@
 
 # 專案設定
 # 專案名稱 (僅限英數，會以此建立資料夾)
-PROJECT=jr-earring
+PROJECT=codepulse
 # 專案網址 (僅限英數，會以此建立 nginx 網站設定檔)
-SITE=jr-earring.com
+SITE=codepulse.com
 # php 版本
 PHP_VERSION=8.1
 # Comopser 版本 (留空則安裝最新版)
 COMPOSER_VERSION=
 
 # 資料庫相關
-# 是否在本機安裝資料庫，使用 RDS 請設定為 false
+# 是否在本機安裝 MariaDB，使用 RDS 請設定為 false
 INSTALL_MARIADB=true
 # 資料庫 root 使用者密碼
-ROOT_PASS=9ao,,1:ieJMS
+ROOT_PASS=tRRdpPFHnyGp$nWK
 # 資料庫名稱
-DATABASE=db_jr
+DATABASE=cp_codepulse
 # 資料庫使用者帳號
-USER_NAME=user
+USER_NAME=codepulse
 # 資料庫使用者密碼
-USER_PASS=up5mgFpY
+USER_PASS=AemFv26V-+B%#x.Y
 
 # SSL 相關
 # 是否在本機安裝免費的 SSL 憑證
@@ -95,7 +95,7 @@ fi
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
-# 安裝資料庫
+# 安裝 MariaDB
 if $INSTALL_MARIADB; then
 apt install -y mariadb-server
 SECURE_MYSQL=$(expect -c "
