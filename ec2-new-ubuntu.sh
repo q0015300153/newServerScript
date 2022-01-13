@@ -156,7 +156,7 @@ sed -i 's/^max_input_time.*/max_input_time = 600/' /etc/php/${PHP_VERSION}/fpm/p
 # 使用短語法
 sed -i 's/^short_open_tag.*/short_open_tag = on/' /etc/php/${PHP_VERSION}/fpm/php.ini
 # 時區
-sed -i 's|;date\.timezone.*|date.timezone = Asia/Taipei|' /etc/php/{PHP_VERSION}/fpm/php.ini
+sed -i 's|;date\.timezone.*|date.timezone = Asia/Taipei|' /etc/php/${PHP_VERSION}/fpm/php.ini
 systemctl restart php${PHP_VERSION}-fpm
 
 # 建立網站設定檔
