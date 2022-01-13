@@ -26,6 +26,9 @@ USER_NAME=codepulse
 # 資料庫使用者密碼
 USER_PASS=AemFv26V-+B%#x.Y
 
+# 是否在本機安裝 Redis，使用 RDS 請設定為 false
+INSTALL_REDIS=true
+
 # SSL 相關
 # 是否在本機安裝免費的 SSL 憑證
 installFreeSLL=false
@@ -127,6 +130,13 @@ mysql -uroot -p${ROOT_PASS} -e "FLUSH PRIVILEGES;"
 mysql -uroot -p${ROOT_PASS} -e "CREATE DATABASE ${DATABASE};"
 mysql -uroot -p${ROOT_PASS} -e "CREATE USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${USER_PASS}';"
 mysql -uroot -p${ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${DATABASE}.* TO '${USER_NAME}'@'localhost';"
+fi
+
+# 安裝 Redis
+if $INSTALL_REDIS; then
+apt install -y redis-server
+sed -i 's/supervised.*/supervised systemd/' /etc/redis/redis.conf
+systemctl restart redis.service
 fi
 
 # 建立網站資料夾
