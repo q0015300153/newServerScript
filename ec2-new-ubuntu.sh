@@ -15,7 +15,7 @@ PHP_VERSION=8.1
 COMPOSER_VERSION=
 
 # 資料庫相關
-# 是否在本機安裝資料庫，使用 RDS 請設定為 false
+# 是否在本機安裝 MariaDB，使用 RDS 請設定為 false
 INSTALL_MARIADB=true
 # 資料庫 root 使用者密碼
 ROOT_PASS=tRRdpPFHnyGp$nWK
@@ -95,7 +95,7 @@ fi
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
-# 安裝資料庫
+# 安裝 MariaDB
 if $INSTALL_MARIADB; then
 apt install -y mariadb-server
 SECURE_MYSQL=$(expect -c "
