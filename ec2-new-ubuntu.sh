@@ -53,6 +53,8 @@ apt update -y
 apt upgrade -y
 # 設定時區
 timedatectl set-timezone Asia/Taipei
+echo "Asia/Taipei" | sudo tee /etc/timezone
+dpkg-reconfigure --frontend noninteractive tzdata
 # 安裝 php 庫
 apt install -y software-properties-common
 add-apt-repository -y ppa:ondrej/php
