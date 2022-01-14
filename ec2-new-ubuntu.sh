@@ -245,6 +245,7 @@ server {
     #
     # include snippets/snakeoil.conf;
 
+    #root "/var/www";
     root "/home/www-data/'${PROJECT}'";
 
     # Add index.php to the list if you are using PHP
