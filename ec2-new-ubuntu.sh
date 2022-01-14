@@ -144,9 +144,9 @@ send \"N\r\"
 expect \"Change the root password?\"
 send \"Y\r\"
 expect \"New password:\"
-send \"${ROOT_PASS}\r\"
+send \"${MARIA_ROOT_PASS}\r\"
 expect \"Re-enter new password:\"
-send \"${ROOT_PASS}\r\"
+send \"${MARIA_ROOT_PASS}\r\"
 expect \"Remove anonymous users?\"
 send \"Y\r\"
 expect \"Disallow root login remotely?\"
@@ -158,11 +158,11 @@ send \"Y\r\"
 expect eof
 ")
 echo $SECURE_MYSQL
-mysql -uroot -p${ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
-mysql -uroot -p${ROOT_PASS} -e "FLUSH PRIVILEGES;"
-mysql -uroot -p${ROOT_PASS} -e "CREATE DATABASE ${DATABASE};"
-mysql -uroot -p${ROOT_PASS} -e "CREATE USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${USER_PASS}';"
-mysql -uroot -p${ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${DATABASE}.* TO '${USER_NAME}'@'localhost';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "FLUSH PRIVILEGES;"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE DATABASE ${MARIA_DATABASE};"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE USER '${MARIA_NAME}'@'localhost' IDENTIFIED BY '${MARIA_PASS}';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${MARIA_DATABASE}.* TO '${MARIA_NAME}'@'localhost';"
 fi
 
 # 安裝 Redis
