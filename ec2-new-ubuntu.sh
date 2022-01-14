@@ -39,6 +39,10 @@ MARIA_PASS=AemFv26V-+B%#x.Y
 
 # 是否在本機安裝 Redis，使用 RDS 請設定為 false
 INSTALL_REDIS=true
+# Redis 密碼，空則表示不用密碼
+# 如果有設定密碼記得更改 phpRedisAdmin/includes/config.inc.php 內的設定值
+# 將 $config['servers']['auth'] 的註解取消並寫上相同密碼
+REDIS_PASS=
 
 # SSL 相關
 # 是否在本機安裝免費的 SSL 憑證
@@ -168,8 +172,10 @@ fi
 # 安裝 Redis
 if $INSTALL_REDIS; then
 apt install -y redis-server
-sed -i 's/supervised.*/supervised systemd/' /etc/redis/redis.conf
+if [ "${REDIS_PASS}" != "" ]; then
+sed -i 's/# requirepass.*/requirepass '${REDIS_PASS}'/' /etc/redis/redis.conf
 systemctl restart redis.service
+fi
 fi
 
 # 建立網站資料夾
