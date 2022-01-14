@@ -6,9 +6,9 @@ sudo sh ./ec2-new-buuntu.sh
 ```
 ### 腳本內有參數，請依照專案與環境修改
 
-> 此腳本會安裝 nginx + php + mariadb 在 ubuntu 上
+> 此腳本會安裝 LNMP 在 Ubuntu 上
 > 
-> 並設定資料庫使用者 + nginx 網站設定檔
+> 並設定資料庫使用者 + NginX 網站設定檔
 
 > 如果在虛擬機測試記得不要開啟安裝免費 SSL 證書，
 > 
@@ -17,8 +17,12 @@ sudo sh ./ec2-new-buuntu.sh
 > 如果使用 RDS 不用安裝資料庫
 
 > 附有 index.php 用以驗證架設成功
+>
+> 以 phpPgAdmin 連接 PostgreSQL (如果有在本機安裝)
 > 
-> 以 adminer.php 連接資料庫 (如果有安裝資料庫的話)
+> 以 phpMyAdmin 連接 MariaDB (如果有在本機安裝)
+>
+> 以 phpRedisAdmin 連接 Redis (如果有在本機安裝)
 
 
 ### 本機測試用 VM 檔，完全乾淨的 Ubuntu

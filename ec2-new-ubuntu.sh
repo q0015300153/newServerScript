@@ -10,21 +10,32 @@ PROJECT=codepulse
 # 專案網址 (僅限英數，會以此建立 nginx 網站設定檔)
 SITE=codepulse.com
 # php 版本
-PHP_VERSION=8.1
+PHP_VERSION=8.0
 # Comopser 版本 (留空則安裝最新版)
 COMPOSER_VERSION=
 
 # 資料庫相關
+# 是否在本機安裝 PostgreSQL，使用 RDS 請設定為 false
+INSTALL_PGSQL=true
+# 管理員密碼
+PGSQL_ROOT_PASS=H9r.pWeGpvy=3Ph8
+# 資料庫名稱
+PGSQL_DATABASE=cp_codepulse
+# 資料庫使用者帳號
+PGSQL_NAME=codepulse
+# 資料庫使用者密碼
+PGSQL_PASS=AemFv26V-+B%#x.Y
+
 # 是否在本機安裝 MariaDB，使用 RDS 請設定為 false
 INSTALL_MARIADB=true
-# 資料庫 root 使用者密碼
-ROOT_PASS=tRRdpPFHnyGp$nWK
+# 管理員密碼
+MARIA_ROOT_PASS=H9r.pWeGpvy=3Ph8
 # 資料庫名稱
-DATABASE=cp_codepulse
+MARIA_DATABASE=cp_codepulse
 # 資料庫使用者帳號
-USER_NAME=codepulse
+MARIA_NAME=codepulse
 # 資料庫使用者密碼
-USER_PASS=AemFv26V-+B%#x.Y
+MARIA_PASS=AemFv26V-+B%#x.Y
 
 # 是否在本機安裝 Redis，使用 RDS 請設定為 false
 INSTALL_REDIS=true
@@ -41,6 +52,9 @@ timedatectl set-timezone Asia/Taipei
 # 安裝 php 庫
 apt install -y software-properties-common
 add-apt-repository -y ppa:ondrej/php
+# 安裝 PostgreSQL 庫
+sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 # 安裝 mariadb 庫
 apt-get install software-properties-common
 apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
@@ -52,6 +66,7 @@ apt install -y tcl tk expect curl git unzip nginx
 if [ $PHP_VERSION < 8 ]; then
     apt install -y \
         php${PHP_VERSION}-fpm \
+        php${PHP_VERSION}-pgsql \
         php${PHP_VERSION}-gd \
         php${PHP_VERSION}-bz2 \
         php${PHP_VERSION}-cgi \
@@ -70,6 +85,7 @@ if [ $PHP_VERSION < 8 ]; then
 else
     apt install -y \
         php${PHP_VERSION}-fpm \
+        php${PHP_VERSION}-pgsql \
         php${PHP_VERSION}-gd \
         php${PHP_VERSION}-bz2 \
         php${PHP_VERSION}-cgi \
@@ -98,6 +114,23 @@ fi
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
+# 安裝 PostgreSQL
+if $INSTALL_PGSQL; then
+apt install -y postgresql postgresql-client postgresql-client-common postgresql-common postgresql-contrib
+su postgres << EOF
+PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "ALTER USER postgres WITH PASSWORD '${PGSQL_ROOT_PASS}';"
+PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "CREATE USER ${PGSQL_NAME} WITH PASSWORD '${PGSQL_PASS}';"
+PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "CREATE DATABASE ${PGSQL_DATABASE} OWNER '${PGSQL_NAME}';"
+PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "GRANT ALL PRIVILEGES ON DATABASE ${PGSQL_DATABASE} TO ${PGSQL_NAME};"
+EOF
+PG_CONF=$(find /etc/postgresql/ -type f -name "postgresql.conf")
+PG_HBA=$(find /etc/postgresql/ -type f -name "pg_hba.conf")
+sed -i "s/#listen_addresses.*/listen_addresses = '*'/" ${PG_CONF}
+sed -i 's/local.*all.*postgres.*peer/local   all             postgres                                md5/' ${PG_HBA}
+sed -i 's/local.*all.*all.*peer/local   all             all                                     md5/' ${PG_HBA}
+systemctl restart postgresql
+fi
+
 # 安裝 MariaDB
 if $INSTALL_MARIADB; then
 apt install -y mariadb-server
@@ -111,9 +144,9 @@ send \"N\r\"
 expect \"Change the root password?\"
 send \"Y\r\"
 expect \"New password:\"
-send \"${ROOT_PASS}\r\"
+send \"${MARIA_ROOT_PASS}\r\"
 expect \"Re-enter new password:\"
-send \"${ROOT_PASS}\r\"
+send \"${MARIA_ROOT_PASS}\r\"
 expect \"Remove anonymous users?\"
 send \"Y\r\"
 expect \"Disallow root login remotely?\"
@@ -125,11 +158,11 @@ send \"Y\r\"
 expect eof
 ")
 echo $SECURE_MYSQL
-mysql -uroot -p${ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
-mysql -uroot -p${ROOT_PASS} -e "FLUSH PRIVILEGES;"
-mysql -uroot -p${ROOT_PASS} -e "CREATE DATABASE ${DATABASE};"
-mysql -uroot -p${ROOT_PASS} -e "CREATE USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${USER_PASS}';"
-mysql -uroot -p${ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${DATABASE}.* TO '${USER_NAME}'@'localhost';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "FLUSH PRIVILEGES;"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE DATABASE ${MARIA_DATABASE};"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE USER '${MARIA_NAME}'@'localhost' IDENTIFIED BY '${MARIA_PASS}';"
+mysql -uroot -p${MARIA_ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${MARIA_DATABASE}.* TO '${MARIA_NAME}'@'localhost';"
 fi
 
 # 安裝 Redis
@@ -212,6 +245,7 @@ server {
     #
     # include snippets/snakeoil.conf;
 
+    #root "/var/www";
     root "/home/www-data/'${PROJECT}'";
 
     # Add index.php to the list if you are using PHP
