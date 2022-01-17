@@ -113,33 +113,33 @@ apt upgrade -y
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 if [ ${COMPOSER_VERSION} ]; then
-php composer-setup.php --version=${COMPOSER_VERSION}
+    php composer-setup.php --version=${COMPOSER_VERSION}
 else
-php composer-setup.php
+    php composer-setup.php
 fi
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
 # 安裝 PostgreSQL
 if $INSTALL_PGSQL; then
-apt install -y postgresql postgresql-client postgresql-client-common postgresql-common postgresql-contrib
+    apt install -y postgresql postgresql-client postgresql-client-common postgresql-common postgresql-contrib
 su postgres << EOF
 PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "ALTER USER postgres WITH PASSWORD '${PGSQL_ROOT_PASS}';"
 PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "CREATE USER ${PGSQL_NAME} WITH PASSWORD '${PGSQL_PASS}';"
 PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "CREATE DATABASE ${PGSQL_DATABASE} OWNER '${PGSQL_NAME}';"
 PGPASSWORD=${PGSQL_ROOT_PASS} psql -c "GRANT ALL PRIVILEGES ON DATABASE ${PGSQL_DATABASE} TO ${PGSQL_NAME};"
 EOF
-PG_CONF=$(find /etc/postgresql/ -type f -name "postgresql.conf")
-PG_HBA=$(find /etc/postgresql/ -type f -name "pg_hba.conf")
-sed -i "s/#listen_addresses.*/listen_addresses = '*'/" ${PG_CONF}
-sed -i 's/local.*all.*postgres.*peer/local   all             postgres                                md5/' ${PG_HBA}
-sed -i 's/local.*all.*all.*peer/local   all             all                                     md5/' ${PG_HBA}
-systemctl restart postgresql
+    PG_CONF=$(find /etc/postgresql/ -type f -name "postgresql.conf")
+    PG_HBA=$(find /etc/postgresql/ -type f -name "pg_hba.conf")
+    sed -i "s/#listen_addresses.*/listen_addresses = '*'/" ${PG_CONF}
+    sed -i 's/local.*all.*postgres.*peer/local   all             postgres                                md5/' ${PG_HBA}
+    sed -i 's/local.*all.*all.*peer/local   all             all                                     md5/' ${PG_HBA}
+    systemctl restart postgresql
 fi
 
 # 安裝 MariaDB
 if $INSTALL_MARIADB; then
-apt install -y mariadb-server
+    apt install -y mariadb-server
 SECURE_MYSQL=$(expect -c "
 set timeout 10
 spawn mysql_secure_installation
@@ -163,21 +163,21 @@ expect \"Reload privilege tables now?\"
 send \"Y\r\"
 expect eof
 ")
-echo $SECURE_MYSQL
-mysql -uroot -p${MARIA_ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
-mysql -uroot -p${MARIA_ROOT_PASS} -e "FLUSH PRIVILEGES;"
-mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE DATABASE ${MARIA_DATABASE};"
-mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE USER '${MARIA_NAME}'@'localhost' IDENTIFIED BY '${MARIA_PASS}';"
-mysql -uroot -p${MARIA_ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${MARIA_DATABASE}.* TO '${MARIA_NAME}'@'localhost';"
+    echo $SECURE_MYSQL
+    mysql -uroot -p${MARIA_ROOT_PASS} -e "SET GLOBAL time_zone = '+8:00';"
+    mysql -uroot -p${MARIA_ROOT_PASS} -e "FLUSH PRIVILEGES;"
+    mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE DATABASE ${MARIA_DATABASE};"
+    mysql -uroot -p${MARIA_ROOT_PASS} -e "CREATE USER '${MARIA_NAME}'@'localhost' IDENTIFIED BY '${MARIA_PASS}';"
+    mysql -uroot -p${MARIA_ROOT_PASS} -e "GRANT ALL PRIVILEGES ON ${MARIA_DATABASE}.* TO '${MARIA_NAME}'@'localhost';"
 fi
 
 # 安裝 Redis
 if $INSTALL_REDIS; then
-apt install -y redis-server
-if [ "${REDIS_PASS}" != "" ]; then
-sed -i 's/# requirepass.*/requirepass '${REDIS_PASS}'/' /etc/redis/redis.conf
-systemctl restart redis.service
-fi
+    apt install -y redis-server
+    if [ "${REDIS_PASS}" != "" ]; then
+        sed -i 's/# requirepass.*/requirepass '${REDIS_PASS}'/' /etc/redis/redis.conf
+        systemctl restart redis.service
+    fi
 fi
 
 # 建立網站資料夾
@@ -315,7 +315,6 @@ server {
     }
 }
 
-
 # Virtual Host configuration for example.com
 #
 # You can move that to a different file under sites-available/ and symlink that
@@ -404,10 +403,10 @@ systemctl reload nginx
 
 # 安裝 SSL 憑證
 if $installFreeSLL; then
-snap install --classic certbot
-ln -s /snap/bin/certbot /usr/bin/certbot
-certbot --nginx && \
-sed -i "s/listen 443 ssl;/listen 443 ssl http2;/" /etc/nginx/sites-available/${PROJECT}.conf && \
-sed -i "s/443 ssl ipv6only=on;/443 ssl http2 ipv6only=on;/" /etc/nginx/sites-available/${PROJECT}.conf
-systemctl reload nginx
+    snap install --classic certbot
+    ln -s /snap/bin/certbot /usr/bin/certbot
+    certbot --nginx && \
+    sed -i "s/listen 443 ssl;/listen 443 ssl http2;/" /etc/nginx/sites-available/${PROJECT}.conf && \
+    sed -i "s/443 ssl ipv6only=on;/443 ssl http2 ipv6only=on;/" /etc/nginx/sites-available/${PROJECT}.conf
+    systemctl reload nginx
 fi
