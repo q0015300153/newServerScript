@@ -48,7 +48,7 @@ REDIS_PASS=
 # 是否安裝並設定 SSR
 INSTALL_SSR=true
 # rendora 設定檔名稱
-RENDORA_CONFIG=config.yml
+RENDORA_CONFIG=${SITE}.config.yml
 # rendora 監聽 port
 RENDORA_LISTEN_PORT=3001
 # ssr 導向 prot
