@@ -39,3 +39,4 @@ sudo sh ./ec2-new-buuntu.sh
 > 
 > 轉 22、80、443 port
 ![VM 圖](./vm.png)
+![SSR 說明圖](./ssr.png)
