@@ -613,7 +613,7 @@ EOF'
     # 守護執行程式
     # 安裝 supervisor
     apt install -y supervisor
-sudo bash -c 'cat << EOF > /etc/supervisor/conf.d/chrome.conf
+bash -c 'cat << EOF > /etc/supervisor/conf.d/chrome.conf
 [program:chrome]
 directory=/usr/bin
 command=google-chrome-stable --headless --disable-gpu --remote-debugging-port='${CHROME_PORT}'
@@ -623,7 +623,7 @@ autorestart=true
 user=ubuntu
 EOF'
 
-sudo bash -c 'cat << EOF > /etc/supervisor/conf.d/rendora.'${RENDORA_CONFIG}'.conf
+bash -c 'cat << EOF > /etc/supervisor/conf.d/rendora.'${RENDORA_CONFIG}'.conf
 [program:rendora]
 directory=/usr/bin
 command=rendora --config '${SCRIPT_DIR}'/'${RENDORA_CONFIG}'
