@@ -258,6 +258,7 @@ server {
 EOF'
 if $INSTALL_SSR; then
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/default
+
     location / {
         proxy_pass http://localhost:'${RENDORA_LISTEN_PORT}';
         proxy_set_header X-Real-IP $remote_addr;
@@ -265,9 +266,11 @@ bash -c 'cat <<\EOF >> /etc/nginx/sites-available/default
         proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
         try_files $uri $uri/ /index.php?$args;
     }
+
 EOF'
 else
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/default
+
     location / {
         try_files $uri $uri/ /index.php?$args;
     }
@@ -276,6 +279,7 @@ bash -c 'cat <<\EOF >> /etc/nginx/sites-available/default
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php'${PHP_VERSION}'-fpm.sock;
     }
+
 EOF'
 fi
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/default
@@ -418,12 +422,15 @@ systemctl reload nginx
 
 # 安裝 SSR
 if $INSTALL_SSR; then
-    # 安裝 chrome
     cd $SCRIPT_DIR
+
+    # 安裝 chrome
     apt install -y make libappindicator1 fonts-liberation gdebi-core
     apt install -f
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     gdebi --non-interactive google-chrome*.deb
+
+    # 安裝 rendora
     # 下載 go
     wget https://go.dev/dl/go1.17.6.linux-amd64.tar.gz && \
     tar zxvf go1.17.6.linux-amd64.tar.gz
@@ -535,7 +542,7 @@ user=ubuntu
 EOF'
 
 bash -c 'cat << EOF > /etc/supervisor/conf.d/rendora.'${RENDORA_CONFIG}'.conf
-[program:rendora]
+[program:rendora.'${SITE}']
 directory=/usr/bin
 command=rendora --config '${SCRIPT_DIR}'/'${RENDORA_CONFIG}'
 numprocs=1
