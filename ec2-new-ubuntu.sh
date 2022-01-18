@@ -360,7 +360,8 @@ bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
 EOF'
 
 if $INSTALL_SSR; then
-bash -c 'cat <<\EOF > /etc/nginx/sites-available/'${PROJECT}'.conf
+bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
+
 server {
     listen '${SSR_PROT}';
     server_name localhost;
