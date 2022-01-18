@@ -321,6 +321,7 @@ server {
 EOF'
 if $INSTALL_SSR; then
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
+
     location / {
         proxy_pass http://localhost:'${RENDORA_LISTEN_PORT}';
         proxy_set_header X-Real-IP $remote_addr;
@@ -328,9 +329,11 @@ bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
         proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
         try_files $uri $uri/ /index.php?$args;
     }
+
 EOF'
 else
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
+
     location / {
         try_files $uri $uri/ /index.php?$args;
     }
@@ -339,6 +342,7 @@ bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php'${PHP_VERSION}'-fpm.sock;
     }
+
 EOF'
 fi
 bash -c 'cat <<\EOF >> /etc/nginx/sites-available/'${PROJECT}'.conf
@@ -396,14 +400,6 @@ server {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php'${PHP_VERSION}'-fpm.sock;
     }
-
-    # Enable SSL
-    #ssl_certificate "ssl.crt";
-    #ssl_certificate_key "ssl.key";
-    #ssl_session_timeout 5m;
-    #ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-    #ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
-    #ssl_prefer_server_ciphers on;
 
     charset utf-8;
     location = /favicon.ico { access_log off; log_not_found off; }
